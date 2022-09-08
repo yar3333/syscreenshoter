@@ -30,20 +30,20 @@ namespace SyScreenshoter
 
         private void setActiveButton(ToolStripButton bt)
         {
+            addActPrimitive();
+            
             btPen.Checked = bt == btPen;
             btText.Checked = bt == btText;
         }
 
         private void btPen_Click(object sender, EventArgs e)
         {
-            addActPrimitive();
             setActiveButton(btPen);
             pictureBox.Cursor = Cursors.Arrow;
         }
 
         private void btText_Click(object sender, EventArgs e)
         {
-            addActPrimitive();
             setActiveButton(btText);
             pictureBox.Cursor = Cursors.IBeam;
         }
