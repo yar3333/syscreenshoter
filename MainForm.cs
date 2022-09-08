@@ -2,18 +2,27 @@ namespace SyScreenshoter
 {
     public partial class MainForm : Form
     {
-        private static readonly Primitive UNDO_DELIMITER = new() { Kind = PrimitiveKind.UndoDelimiter };
+        private const int PEN_WIDTH = 5;
+        private const int FONT_SIZE = 14;
+        private const int NEW_LINE_DY = 20;
         
+        private static readonly Primitive UNDO_DELIMITER = new() { Kind = PrimitiveKind.UndoDelimiter };
+
+        private readonly ShadowForm shadowForm;
+
         private List<Primitive> primitives = new();
         private readonly List<Primitive[]> redoPrimitiveBlocks = new();
 
         private Primitive? actPrim;
 
+        private readonly Pen pen;
+        private readonly Font font;
+
         public MainForm()
         {
             InitializeComponent();
 
-            var shadowForm = new ShadowForm();
+            shadowForm = new ShadowForm();
             
             shadowForm.OnCaptured = bmp =>
             {
@@ -23,7 +32,15 @@ namespace SyScreenshoter
                 Opacity = 100;
                 pictureBox.BackgroundImage = bmp;
             };
+            
             shadowForm.Show();
+
+            pen = new Pen(new SolidBrush(Color.Red));
+            pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+            pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+            pen.Width = PEN_WIDTH;
+
+            font = new Font(SystemFonts.DefaultFont.FontFamily, FONT_SIZE, FontStyle.Regular);
 
             setActiveButton(btPen);
         }
@@ -48,13 +65,55 @@ namespace SyScreenshoter
             pictureBox.Cursor = Cursors.IBeam;
         }
 
-        private void btCopy_Click(object sender, EventArgs e)
+        private void btCopy_Click(object? sender, EventArgs? e)
         {
             addActPrimitive();
 
+            var minX = - pictureBox.BackgroundImage.Width  / 2;
+            var minY = - pictureBox.BackgroundImage.Height / 2;
+            var maxX =   pictureBox.BackgroundImage.Width  / 2;
+            var maxY =   pictureBox.BackgroundImage.Height / 2;
+
+            foreach (var p in primitives)
+            {
+                switch (p.Kind)
+                {
+                    case PrimitiveKind.Line:
+                        minX = Math.Min(minX, Math.Min(p.Pt0.X - PEN_WIDTH, p.Pt1.X - PEN_WIDTH));
+                        minY = Math.Min(minY, Math.Min(p.Pt0.Y - PEN_WIDTH, p.Pt1.Y - PEN_WIDTH));
+                        maxX = Math.Max(maxX, Math.Max(p.Pt0.X + PEN_WIDTH, p.Pt1.X + PEN_WIDTH));
+                        maxY = Math.Max(maxY, Math.Max(p.Pt0.Y + PEN_WIDTH, p.Pt1.Y + PEN_WIDTH));
+                        break;
+
+                    case PrimitiveKind.Text:
+                        var sz = TextRenderer.MeasureText(p.Text, font);
+                        minX = Math.Min(minX, p.Pt0.X);
+                        minY = Math.Min(minY, p.Pt0.Y);
+                        maxX = Math.Max(maxX, p.Pt0.X + sz.Width);
+                        maxY = Math.Max(maxY, p.Pt0.Y + sz.Height);
+                        break;
+                }
+            }
+            
+            using var bmp = new Bitmap(maxX - minX, maxY - minY);
+            using var g = Graphics.FromImage(bmp);
+            g.FillRectangle(Brushes.White, 0, 0, bmp.Width, bmp.Height);
+            var dx = -minX - pictureBox.BackgroundImage.Width / 2;
+            var dy = -minY - pictureBox.BackgroundImage.Height / 2;
+            g.DrawImage(pictureBox.BackgroundImage, dx, dy);
+            drawPrimitives(new Point(-minX, -minY), g);
+            
+            Clipboard.SetImage(bmp);
         }
 
         private void pictureBox_Paint(object sender, PaintEventArgs e)
+        {
+            var cen = new Point(ClientSize.Width / 2, ClientSize.Height / 2);
+            
+            drawPrimitives(cen, e.Graphics);
+        }
+
+        private void drawPrimitives(Point cen, Graphics g)
         {
             if (actPrim != null)
             {
@@ -73,25 +132,16 @@ namespace SyScreenshoter
                         break;
                 }
             }
-
-            using var pen = new Pen(new SolidBrush(Color.Red));
-            pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
-            pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
-            pen.Width = 5;
-
-            using var font = new Font(SystemFonts.DefaultFont.FontFamily, 14, FontStyle.Regular);
-
-            var cen = new Point(ClientSize.Width / 2, ClientSize.Height / 2);
             
             foreach (var p in primitives)
             {
                 switch (p.Kind)
                 {
                     case PrimitiveKind.Line:
-                        e.Graphics.DrawLine(pen, cen.X + p.Pt0.X, cen.Y + p.Pt0.Y, cen.X + p.Pt1.X, cen.Y + p.Pt1.Y);
+                        g.DrawLine(pen, cen.X + p.Pt0.X, cen.Y + p.Pt0.Y, cen.X + p.Pt1.X, cen.Y + p.Pt1.Y);
                         break;
                     case PrimitiveKind.Text:
-                        e.Graphics.DrawString(p.Text, font, Brushes.Red, cen.X + p.Pt0.X, cen.Y + p.Pt0.Y);
+                        g.DrawString(p.Text, font, Brushes.Red, cen.X + p.Pt0.X, cen.Y + p.Pt0.Y);
                         break;
                 }
             }
@@ -212,6 +262,13 @@ namespace SyScreenshoter
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Modifiers == 0 && e.KeyCode == Keys.Escape)
+            {
+                Application.Exit();
+            }
+
+            if (shadowForm.Visible) return;
+            
             if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Z)
             {
                 if (!primitives.Any()) return;
@@ -225,7 +282,7 @@ namespace SyScreenshoter
                 Refresh();
             }
 
-            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Y)
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Y || e.Modifiers == (Keys.Control|Keys.Shift) && e.KeyCode == Keys.Z)
             {
                 if (!redoPrimitiveBlocks.Any()) return;
 
@@ -237,10 +294,17 @@ namespace SyScreenshoter
 
                 Refresh();
             }
+
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.C)
+            {
+                btCopy_Click(null, null);
+            }
         }
 
         private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
         {
+            if (shadowForm.Visible) return;
+
             if (actPrim?.Kind != PrimitiveKind.Text) return;
 
             if (e.KeyChar == '\b')
@@ -259,7 +323,7 @@ namespace SyScreenshoter
                 actPrim = new Primitive
                 {
                     Kind = PrimitiveKind.Text,
-                    Pt0 = new Point(pt.X, pt.Y + 20),
+                    Pt0 = new Point(pt.X, pt.Y + NEW_LINE_DY),
                     Text = ""
                 };
                 e.Handled = true;

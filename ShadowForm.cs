@@ -114,13 +114,5 @@
                 e.Graphics.FillRectangle(brush, ClientRectangle);
             }
         }
-
-        private void ShadowForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Modifiers == 0 && e.KeyCode == Keys.Escape)
-            {
-                Visible = false;
-            }
-        }
     }
 }
