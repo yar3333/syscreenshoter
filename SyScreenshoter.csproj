@@ -6,11 +6,17 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <StartupObject>SyScreenshoter.Program</StartupObject>
+    <ApplicationIcon>Images\camera.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="SyScreenshoter.sln.DotSettings" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\camera.ico" />
   </ItemGroup>
 
   <ItemGroup>
