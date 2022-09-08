@@ -2,6 +2,8 @@ namespace SyScreenshoter
 {
     public partial class MainForm : Form
     {
+        private static readonly Primitive UNDO_DELIMITER = new() { Kind = PrimitiveKind.UndoDelimiter };
+        
         private List<Primitive> primitives = new();
         private readonly List<Primitive[]> redoPrimitiveBlocks = new();
 
@@ -109,7 +111,7 @@ namespace SyScreenshoter
             
             if (btPen.Checked)
             {
-                if (primitives.LastOrDefault() != Primitive.UNDO_DELIMITER) primitives.Add(Primitive.UNDO_DELIMITER);
+                if (primitives.LastOrDefault() != UNDO_DELIMITER) primitives.Add(UNDO_DELIMITER);
                 actPrim = new Primitive
                 {
                     Kind = PrimitiveKind.Line,
@@ -192,13 +194,13 @@ namespace SyScreenshoter
                 case PrimitiveKind.Text:
                     if (actPrim.Text != "")
                     {
-                        primitives.Add(Primitive.UNDO_DELIMITER);
+                        primitives.Add(UNDO_DELIMITER);
                         primitives.Add(actPrim);
                     }
                     break;
             }
 
-            while (primitives.LastOrDefault() == Primitive.UNDO_DELIMITER)
+            while (primitives.LastOrDefault() == UNDO_DELIMITER)
             {
                 primitives.RemoveAt(primitives.Count - 1);
             }
@@ -216,7 +218,7 @@ namespace SyScreenshoter
                 
                 addActPrimitive();
                 
-                var i = primitives.FindLastIndex(x => x == Primitive.UNDO_DELIMITER);
+                var i = primitives.FindLastIndex(x => x == UNDO_DELIMITER);
                 redoPrimitiveBlocks.Add(primitives.GetRange(i, primitives.Count - i).ToArray());
                 primitives = primitives.GetRange(0, i);
 
