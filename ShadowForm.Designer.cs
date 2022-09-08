@@ -39,8 +39,9 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "ShadowForm";
             this.ShowInTaskbar = false;
-            this.Text = "SyImageCapture";
+            this.Text = "SyScreenshoter";
             this.TopMost = true;
+            this.Load += new System.EventHandler(this.ShadowForm_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.ShadowForm_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ShadowForm_KeyDown);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ShadowForm_MouseDown);

@@ -2,24 +2,38 @@
 {
     public partial class ShadowForm : Form
     {
-        public int x0;
-        public int y0;
-        public int x1;
-        public int y1;
+        private int x0;
+        private int y0;
+        private int x1;
+        private int y1;
 
-        public Bitmap bmp;
-
-        public Action<Bitmap> OnCaptured;
+        private Bitmap bmp;
 
         private bool inAction;
+        
+        public Action<Bitmap> OnCaptured;
 
         public ShadowForm()
         {
             InitializeComponent();
         }
 
-        public void Init()
+        private void ShadowForm_Load(object sender, EventArgs e)
         {
+            var bounds = Screen.PrimaryScreen.Bounds;
+
+            foreach (var screen in Screen.AllScreens)
+            {
+                var b = new Rectangle();
+                b.X = Math.Min(bounds.X, screen.Bounds.X);
+                b.Y = Math.Min(bounds.Y, screen.Bounds.Y);
+                b.Width = Math.Max(bounds.Right, screen.Bounds.Right) - b.X;
+                b.Height = Math.Max(bounds.Bottom, screen.Bounds.Bottom) - b.Y;
+                bounds = b;    
+            }
+
+            SetDesktopBounds(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+
             bmp = new Bitmap(Bounds.Width, Bounds.Height);
             using var g = Graphics.FromImage(bmp);
             g.CopyFromScreen(Bounds.X, Bounds.Y, 0, 0, bmp.Size);
