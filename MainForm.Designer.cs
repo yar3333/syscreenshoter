@@ -35,7 +35,6 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.btCopy = new System.Windows.Forms.ToolStripButton();
             this.pictureBox = new System.Windows.Forms.PictureBox();
-            this.textBox = new System.Windows.Forms.TextBox();
             this.toolbar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
@@ -106,23 +105,12 @@
             this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
             // 
-            // textBox
-            // 
-            this.textBox.Location = new System.Drawing.Point(443, 190);
-            this.textBox.Name = "textBox";
-            this.textBox.Size = new System.Drawing.Size(100, 23);
-            this.textBox.TabIndex = 2;
-            this.textBox.TabStop = false;
-            this.textBox.Visible = false;
-            this.textBox.TextChanged += new System.EventHandler(this.textBox_TextChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.textBox);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.toolbar);
             this.Name = "MainForm";
@@ -130,11 +118,11 @@
             this.ShowInTaskbar = false;
             this.Text = "SyScreenshoter";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
             this.toolbar.ResumeLayout(false);
             this.toolbar.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -146,6 +134,5 @@
         private PictureBox pictureBox;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripButton btPen;
-        private TextBox textBox;
     }
 }

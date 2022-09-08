@@ -11,8 +11,6 @@ namespace SyScreenshoter
         {
             InitializeComponent();
 
-            textBox.Top = -1000;
-
             var shadowForm = new ShadowForm();
             
             shadowForm.OnCaptured = bmp =>
@@ -68,7 +66,7 @@ namespace SyScreenshoter
                         {
                             Kind = PrimitiveKind.Text,
                             Pt0 = actPrim.Pt0,
-                            Text = textBox.Text + "|"
+                            Text = actPrim.Text + "|"
                         });
                         break;
                 }
@@ -125,12 +123,10 @@ namespace SyScreenshoter
                 {
                     Kind = PrimitiveKind.Text,
                     Pt0 = loc,
+                    Text = ""
                 };
                 actPrim.Pt0.X -= 3;
                 actPrim.Pt0.Y -= 13;
-                textBox.Text = "";
-                textBox.Visible = true;
-                textBox.Focus();
             }
 
             Refresh();
@@ -183,15 +179,6 @@ namespace SyScreenshoter
             Refresh();
         }
 
-        private void textBox_TextChanged(object sender, EventArgs e)
-        {
-            if (actPrim?.Kind == PrimitiveKind.Text)
-            {
-                actPrim.Text = textBox.Text;
-                Refresh();
-            }
-        }
-
         private void addActPrimitive()
         {
             if (actPrim == null) return;
@@ -208,9 +195,6 @@ namespace SyScreenshoter
                         primitives.Add(Primitive.UNDO_DELIMITER);
                         primitives.Add(actPrim);
                     }
-                    actPrim = null;
-                    textBox.Visible = false;
-                    Focus();
                     break;
             }
 
@@ -230,6 +214,8 @@ namespace SyScreenshoter
             {
                 if (!primitives.Any()) return;
                 
+                addActPrimitive();
+                
                 var i = primitives.FindLastIndex(x => x == Primitive.UNDO_DELIMITER);
                 redoPrimitiveBlocks.Add(primitives.GetRange(i, primitives.Count - i).ToArray());
                 primitives = primitives.GetRange(0, i);
@@ -241,10 +227,46 @@ namespace SyScreenshoter
             {
                 if (!redoPrimitiveBlocks.Any()) return;
 
+                addActPrimitive();
+                
                 var redoBlock = redoPrimitiveBlocks.Last();
                 redoPrimitiveBlocks.RemoveAt(redoPrimitiveBlocks.Count - 1);
                 primitives.AddRange(redoBlock);
 
+                Refresh();
+            }
+        }
+
+        private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (actPrim?.Kind != PrimitiveKind.Text) return;
+
+            if (e.KeyChar == '\b')
+            {
+                if (actPrim.Text != "")
+                {
+                    actPrim.Text = actPrim.Text.Substring(0, actPrim.Text.Length - 1);
+                    e.Handled = true;
+                    Refresh();
+                }
+            }
+            if (e.KeyChar == '\r')
+            {
+                var pt = actPrim.Pt0;
+                addActPrimitive();
+                actPrim = new Primitive
+                {
+                    Kind = PrimitiveKind.Text,
+                    Pt0 = new Point(pt.X, pt.Y + 20),
+                    Text = ""
+                };
+                e.Handled = true;
+                Refresh();
+            }
+            else if (!char.IsControl(e.KeyChar))
+            {
+                actPrim.Text += e.KeyChar;
+                e.Handled = true;
                 Refresh();
             }
         }
