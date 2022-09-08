@@ -3,7 +3,7 @@ namespace SyScreenshoter
     public partial class MainForm : Form
     {
         private List<Primitive> primitives = new();
-        private List<Primitive[]> redoPrimitiveBlocks = new();
+        private readonly List<Primitive[]> redoPrimitiveBlocks = new();
 
         private Primitive? actPrim;
 
