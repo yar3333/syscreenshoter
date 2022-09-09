@@ -30,7 +30,7 @@ namespace SyScreenshoter
                 ShowInTaskbar = true;
                 WindowState = FormWindowState.Maximized;
                 Opacity = 100;
-                pictureBox.BackgroundImage = bmp;
+                pictureBox.Image = bmp;
             };
             
             shadowForm.Show();
@@ -69,10 +69,10 @@ namespace SyScreenshoter
         {
             addActPrimitive();
 
-            var minX = - pictureBox.BackgroundImage.Width  / 2;
-            var minY = - pictureBox.BackgroundImage.Height / 2;
-            var maxX =   pictureBox.BackgroundImage.Width  / 2;
-            var maxY =   pictureBox.BackgroundImage.Height / 2;
+            var minX = - pictureBox.Image.Width  / 2;
+            var minY = - pictureBox.Image.Height / 2;
+            var maxX =   pictureBox.Image.Width  / 2;
+            var maxY =   pictureBox.Image.Height / 2;
 
             foreach (var p in primitives)
             {
@@ -95,12 +95,12 @@ namespace SyScreenshoter
                 }
             }
             
-            using var bmp = new Bitmap(maxX - minX, maxY - minY);
+            using var bmp = new Bitmap(maxX - minX, maxY - minY, pictureBox.Image.PixelFormat);
             using var g = Graphics.FromImage(bmp);
             g.FillRectangle(Brushes.White, 0, 0, bmp.Width, bmp.Height);
-            var dx = -minX - pictureBox.BackgroundImage.Width / 2;
-            var dy = -minY - pictureBox.BackgroundImage.Height / 2;
-            g.DrawImage(pictureBox.BackgroundImage, dx, dy);
+            var dx = -minX - pictureBox.Image.Width / 2;
+            var dy = -minY - pictureBox.Image.Height / 2;
+            g.DrawImage(pictureBox.Image, dx, dy);
             drawPrimitives(new Point(-minX, -minY), g);
             
             Clipboard.SetImage(bmp);
@@ -108,7 +108,7 @@ namespace SyScreenshoter
 
         private void pictureBox_Paint(object sender, PaintEventArgs e)
         {
-            var cen = new Point(ClientSize.Width / 2, ClientSize.Height / 2);
+            var cen = new Point(pictureBox.ClientSize.Width / 2, pictureBox.ClientSize.Height / 2);
             
             drawPrimitives(cen, e.Graphics);
         }
@@ -154,8 +154,8 @@ namespace SyScreenshoter
             pictureBox.Capture = true;
 
             var loc = e.Location;
-            loc.X -= ClientSize.Width / 2;
-            loc.Y -= ClientSize.Height / 2;
+            loc.X -= pictureBox.ClientSize.Width / 2;
+            loc.Y -= pictureBox.ClientSize.Height / 2;
 
             addActPrimitive();
             
@@ -189,8 +189,8 @@ namespace SyScreenshoter
             if (actPrim == null) return;
 
             var loc = e.Location;
-            loc.X -= ClientSize.Width / 2;
-            loc.Y -= ClientSize.Height / 2;
+            loc.X -= pictureBox.ClientSize.Width / 2;
+            loc.Y -= pictureBox.ClientSize.Height / 2;
             
             switch (actPrim.Kind)
             {

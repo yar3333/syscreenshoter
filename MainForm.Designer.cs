@@ -92,7 +92,6 @@
             // pictureBox
             // 
             this.pictureBox.BackColor = System.Drawing.Color.White;
-            this.pictureBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox.Location = new System.Drawing.Point(0, 40);
             this.pictureBox.Name = "pictureBox";
