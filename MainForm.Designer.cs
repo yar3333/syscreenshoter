@@ -33,6 +33,7 @@
             this.btPen = new System.Windows.Forms.ToolStripButton();
             this.btText = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btSave = new System.Windows.Forms.ToolStripButton();
             this.btCopy = new System.Windows.Forms.ToolStripButton();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.toolbar.SuspendLayout();
@@ -47,6 +48,7 @@
             this.btPen,
             this.btText,
             this.toolStripSeparator1,
+            this.btSave,
             this.btCopy});
             this.toolbar.Location = new System.Drawing.Point(0, 0);
             this.toolbar.Name = "toolbar";
@@ -78,6 +80,16 @@
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 40);
+            // 
+            // btSave
+            // 
+            this.btSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btSave.Image = ((System.Drawing.Image)(resources.GetObject("btSave.Image")));
+            this.btSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btSave.Name = "btSave";
+            this.btSave.Size = new System.Drawing.Size(38, 37);
+            this.btSave.Text = "Save";
+            this.btSave.Click += new System.EventHandler(this.btSave_Click);
             // 
             // btCopy
             // 
@@ -134,5 +146,6 @@
         private PictureBox pictureBox;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripButton btPen;
+        private ToolStripButton btSave;
     }
 }

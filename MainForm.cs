@@ -1,3 +1,6 @@
+using System.Drawing.Imaging;
+using System.Windows.Forms;
+
 namespace SyScreenshoter
 {
     public partial class MainForm : Form
@@ -18,6 +21,8 @@ namespace SyScreenshoter
         private readonly Pen pen;
         private readonly Font font;
 
+        private DateTime captureDateTime;
+
         public MainForm()
         {
             InitializeComponent();
@@ -31,6 +36,7 @@ namespace SyScreenshoter
                 WindowState = FormWindowState.Maximized;
                 Opacity = 100;
                 pictureBox.Image = bmp;
+                captureDateTime = DateTime.Now;
             };
             
             shadowForm.Show();
@@ -334,6 +340,23 @@ namespace SyScreenshoter
                 actPrim.Text += e.KeyChar;
                 e.Handled = true;
                 Refresh();
+            }
+        }
+
+        private void btSave_Click(object sender, EventArgs e)
+        {
+            var saveFileDialog = new SaveFileDialog();
+            
+            saveFileDialog.Filter = 
+                "PNG file (*.png)|*.png"
+              + "|JPG file (*.jpg)|*.jpg;*.jpeg"
+              + "|All files (*.*)|*.*";
+
+            saveFileDialog.FileName = captureDateTime.ToString("yyyy-MM-dd_hh-mm-ss");
+            
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                pictureBox.Image.Save(saveFileDialog.FileName, Path.GetExtension(saveFileDialog.FileName).ToLowerInvariant() == ".png" ? ImageFormat.Png : ImageFormat.Jpeg);
             }
         }
     }
